@@ -1,0 +1,78 @@
+----------------------------------------------------------------------------------------------
+x 	 -- global variable indicate whether the critical region is available
+n[2] -- array variable
+
+initial state:
+	 ((x=TRUE) & (n[1] = I) & (n[2] = I) )
+
+node states:
+	{Idle, Try, Crit, Exit}
+
+guarded commands:
+	n_Try[j]  =				  (n[j] = I)	->		(n[j] :=T )
+	n_Crit[j] = ((x = TRUE) & (n[j] = T)	->		((n[j] := C) & (x := FALSE))
+	n_Exit[j] = 			  (n[j] = C)	->		(n[j] := E)
+	n_IdlE[j] = 			  (n[j] = E)	->		((n[j] := I) & (x := TRUE)
+
+inv:
+	mutualInv(i1, i2) = !((n[i1] = C) & (n[i2] = C)) 
+
+
+-----------------------------------------------------------------------------------------------
+rule: n_Try[1]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[2]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[3]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule2
+rule: n_Crit[1]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule3-inv__2:((n[2] = C) & (x = TRUE))
+rule: n_Crit[2]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule3-inv__2:((n[1] = C) & (x = TRUE))
+rule: n_Crit[3]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule2
+rule: n_Exit[1]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule1
+rule: n_Exit[2]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule1
+rule: n_Exit[3]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule2
+rule: n_Idle[1]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[2]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[3]; inv: ((n[1] = C) & (n[2] = C)); g: TRUE; rel: invHoldForRule2
+rule: n_Try[1]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[2]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule2
+rule: n_Crit[1]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Crit[2]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Exit[1]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Exit[2]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule2
+rule: n_Idle[1]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[2]; inv: ((n[1] = C) & (x = TRUE)); g: TRUE; rel: invHoldForRule3-inv__3:((n[1] = C) & (n[2] = E))
+rule: n_Try[1]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[2]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[3]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Crit[1]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Crit[2]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule3-inv__4:((n[1] = E) & (x = TRUE))
+rule: n_Crit[3]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Exit[1]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule3-inv__1:((n[1] = C) & (n[2] = C))
+rule: n_Exit[2]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Exit[3]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Idle[1]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[2]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[3]; inv: ((n[2] = C) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Try[1]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[2]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule2
+rule: n_Crit[1]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Crit[2]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Exit[1]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule3-inv__2:((n[1] = C) & (x = TRUE))
+rule: n_Exit[2]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule2
+rule: n_Idle[1]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[2]; inv: ((n[1] = E) & (x = TRUE)); g: TRUE; rel: invHoldForRule3-inv__5:((n[1] = E) & (n[2] = e))
+rule: n_Try[1]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[2]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Try[3]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Crit[1]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Crit[2]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Crit[3]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Exit[1]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule3-inv__3:((n[1] = C) & (n[2] = E))
+rule: n_Exit[2]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule3-inv__3:((n[2] = C) & (n[1] = E))
+rule: n_Exit[3]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+rule: n_Idle[1]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[2]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule1
+rule: n_Idle[3]; inv: ((n[2] = E) & (n[1] = E)); g: TRUE; rel: invHoldForRule2
+inv__1: ((n[1] = C) & (n[2] = C))
+inv__2: ((n[1] = C) & (x = TRUE))
+inv__3: ((n[2] = C) & (n[1] = E))
+inv__4: ((n[1] = E) & (x = TRUE))
+inv__5: ((n[2] = E) & (n[1] = E))
