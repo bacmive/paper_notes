@@ -152,7 +152,7 @@ $$
         3. 考虑上述公式的子公式$\neg f_1$,$\neg f_2$, $\neg (f_1\land f_2)$,$\neg(f_1\land f_3)$,$\dots$,$\neg(f_1 \land f_2 \land f_2)$。对于每个公式，使用模型检测工具Murphi或NuSMV检测该公式是否为该协议实例的不变式。
         4. 经过上一步骤，得到一个不变式$invOnXC(2) \equiv \neg(x=true\land a[2]=C)$，通过$isNew$程序检查该不变式是否为新的不变式(permutation symmetry)。
         5. 将新得到的不变式$invOnXC(2)$进行***一般化(Generalize)***, 得到一般化后的不变式$invOnXC(i_2)$
-        6. 将元组$(mutualInv(1,2), Crit(1), invHoldRule_3, invOnXC(2))加入到 $tuples$ 数组中
+        6. 将元组$(mutualInv(1,2), Crit(1), invHoldRule_3, invOnXC(2))$加入到 $tuples$ 数组中
         7. 通过$get$函数处理$invOnXC(i_2)$，得到新的不变式$invOnXC(i)$。将$invOnXC(i)$加入$newInvs$队列，并加入到集合$A$中，。
     
     5. 对于公式$f=mutualInv(1,2)$, 规则$r=Crit(2)$<br>
