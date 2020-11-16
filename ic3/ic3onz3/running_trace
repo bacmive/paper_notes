@@ -1,0 +1,776 @@
+ --- modulename: mini_ic3, funcname: <module>
+mini_ic3.py(1): from z3 import *
+mini_ic3.py(2): import heapq
+mini_ic3.py(16): class Horn2Transitions:
+ --- modulename: mini_ic3, funcname: Horn2Transitions
+mini_ic3.py(16): class Horn2Transitions:
+mini_ic3.py(17):     def __init__(self):
+mini_ic3.py(24):     def parse(self, file):
+mini_ic3.py(42):     def is_pred(self, p, name):
+mini_ic3.py(45):     def is_goal(self, body, head):
+mini_ic3.py(57):     def is_body(self, body):
+mini_ic3.py(68):     def is_inv(self, f):
+mini_ic3.py(73):     def is_transition(self, body, head):
+mini_ic3.py(90):     def is_init(self, body, head):
+mini_ic3.py(100):     def subst_vars(self, prefix, inv, fml):
+mini_ic3.py(105):     def mk_subst(self, prefix, inv):
+mini_ic3.py(113):     def mk_bool(self, prefix):
+mini_ic3.py(117):     def get_vars(self, f, rs=[]):
+mini_ic3.py(133): def fd_solver():
+mini_ic3.py(140): def negate(f):
+mini_ic3.py(146): def cube2clause(cube):
+mini_ic3.py(149): class State:
+ --- modulename: mini_ic3, funcname: State
+mini_ic3.py(149): class State:
+mini_ic3.py(150):     def __init__(self, s):
+mini_ic3.py(154):     def add(self, clause):
+mini_ic3.py(159): class Goal:
+ --- modulename: mini_ic3, funcname: Goal
+mini_ic3.py(159): class Goal:
+mini_ic3.py(160):     def __init__(self, cube, parent, level):
+mini_ic3.py(165): def is_seq(f):
+mini_ic3.py(169): def check_disjoint(a, b):
+mini_ic3.py(177): def prune(R):
+mini_ic3.py(190): class MiniIC3:
+ --- modulename: mini_ic3, funcname: MiniIC3
+mini_ic3.py(190): class MiniIC3:
+mini_ic3.py(191):     def __init__(self, init, trans, goal, x0, inputs, xn):
+mini_ic3.py(210):     def next(self, f):
+mini_ic3.py(215):     def prev(self, f):
+mini_ic3.py(220):     def add_solver(self):
+mini_ic3.py(225):     def R(self, i):
+mini_ic3.py(229):     def is_valid(self):
+mini_ic3.py(237):     def value2literal(self, m, x):
+mini_ic3.py(245):     def values2literals(self, m, xs):
+mini_ic3.py(249):     def project0(self, m):
+mini_ic3.py(252):     def projectI(self, m):
+mini_ic3.py(255):     def projectN(self, m):
+mini_ic3.py(260):     def unfold(self):
+mini_ic3.py(281):     def block_cube(self, i, cube):
+mini_ic3.py(285):     def assert_clause(self, i, clause):
+mini_ic3.py(291):     def minimize_cube(self, cube, inputs, lits):
+mini_ic3.py(299):     def push_heap(self, goal):
+mini_ic3.py(304):     def ic3_blocked(self, s0, f0):
+mini_ic3.py(331):     def generalize(self, cube, f):
+mini_ic3.py(340):     def is_inductive(self, f, cube):
+mini_ic3.py(354):     def run(self):
+mini_ic3.py(375): def test(file):
+mini_ic3.py(394): test("data/horn3.smt2")
+ --- modulename: mini_ic3, funcname: test
+mini_ic3.py(376):     h2t = Horn2Transitions()
+ --- modulename: mini_ic3, funcname: __init__
+mini_ic3.py(18):         self.trans = True
+mini_ic3.py(19):         self.init = True
+mini_ic3.py(20):         self.inputs = []
+mini_ic3.py(21):         self.goal = True
+mini_ic3.py(22):         self.index = 0
+mini_ic3.py(377):     h2t.parse(file)
+ --- modulename: mini_ic3, funcname: parse
+mini_ic3.py(25):         fp = Fixedpoint()
+mini_ic3.py(26):         goals = fp.parse_file(file)
+mini_ic3.py(27):         for r in fp.get_rules():
+mini_ic3.py(28):             if not is_quantifier(r):
+mini_ic3.py(30):             b = r.body()
+mini_ic3.py(31):             if not is_implies(b):
+mini_ic3.py(33):             f = b.arg(0)
+mini_ic3.py(34):             g = b.arg(1)
+mini_ic3.py(35):             if self.is_goal(f, g):
+ --- modulename: mini_ic3, funcname: is_goal
+mini_ic3.py(46):         if not self.is_pred(head, "Goal"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(47):             return False
+mini_ic3.py(37):             if self.is_transition(f, g):
+ --- modulename: mini_ic3, funcname: is_transition
+mini_ic3.py(74):         pred, inv0 = self.is_body(body)
+ --- modulename: mini_ic3, funcname: is_body
+mini_ic3.py(58):         if not is_and(body):
+mini_ic3.py(59):             return None, None
+mini_ic3.py(75):         if pred is None:
+mini_ic3.py(76):             return False
+mini_ic3.py(39):             if self.is_init(f, g):
+ --- modulename: mini_ic3, funcname: is_init
+mini_ic3.py(91):         for f in body.children():
+mini_ic3.py(92):             if self.is_inv(f) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(91):         for f in body.children():
+mini_ic3.py(94):         inv = self.is_inv(head)
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(95):         if inv is None:
+mini_ic3.py(97):         self.init = self.subst_vars("x", inv, body)
+ --- modulename: mini_ic3, funcname: subst_vars
+mini_ic3.py(101):         subst = self.mk_subst(prefix, inv)
+ --- modulename: mini_ic3, funcname: mk_subst
+mini_ic3.py(106):         self.index = 0
+mini_ic3.py(107):         if self.is_inv(inv) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(103):         return substitute(fml, subst)
+mini_ic3.py(98):         return True
+mini_ic3.py(40):                 continue
+mini_ic3.py(27):         for r in fp.get_rules():
+mini_ic3.py(28):             if not is_quantifier(r):
+mini_ic3.py(30):             b = r.body()
+mini_ic3.py(31):             if not is_implies(b):
+mini_ic3.py(33):             f = b.arg(0)
+mini_ic3.py(34):             g = b.arg(1)
+mini_ic3.py(35):             if self.is_goal(f, g):
+ --- modulename: mini_ic3, funcname: is_goal
+mini_ic3.py(46):         if not self.is_pred(head, "Goal"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(47):             return False
+mini_ic3.py(37):             if self.is_transition(f, g):
+ --- modulename: mini_ic3, funcname: is_transition
+mini_ic3.py(74):         pred, inv0 = self.is_body(body)
+ --- modulename: mini_ic3, funcname: is_body
+mini_ic3.py(58):         if not is_and(body):
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+mini_ic3.py(61):         inv = None
+mini_ic3.py(62):         for f in body.children():
+mini_ic3.py(63):             if self.is_inv(f) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(64):                 inv = f;
+mini_ic3.py(65):                 break
+mini_ic3.py(66):         return And(fmls), inv
+mini_ic3.py(75):         if pred is None:
+mini_ic3.py(77):         inv1 = self.is_inv(head)
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(78):         if inv1 is None:
+mini_ic3.py(80):         pred = self.subst_vars("x",  inv0, pred)
+ --- modulename: mini_ic3, funcname: subst_vars
+mini_ic3.py(101):         subst = self.mk_subst(prefix, inv)
+ --- modulename: mini_ic3, funcname: mk_subst
+mini_ic3.py(106):         self.index = 0
+mini_ic3.py(107):         if self.is_inv(inv) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(103):         return substitute(fml, subst)
+mini_ic3.py(81):         self.xs = self.vars
+mini_ic3.py(82):         pred = self.subst_vars("xn", inv1, pred)
+ --- modulename: mini_ic3, funcname: subst_vars
+mini_ic3.py(101):         subst = self.mk_subst(prefix, inv)
+ --- modulename: mini_ic3, funcname: mk_subst
+mini_ic3.py(106):         self.index = 0
+mini_ic3.py(107):         if self.is_inv(inv) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(103):         return substitute(fml, subst)
+mini_ic3.py(83):         self.xns = self.vars
+mini_ic3.py(84):         pred = self.subst_vars("i", pred, pred)
+ --- modulename: mini_ic3, funcname: subst_vars
+mini_ic3.py(101):         subst = self.mk_subst(prefix, inv)
+ --- modulename: mini_ic3, funcname: mk_subst
+mini_ic3.py(106):         self.index = 0
+mini_ic3.py(107):         if self.is_inv(inv) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(110):             vars = self.get_vars(inv)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(119):             return z3util.vset(rs + [f], str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(119):             return z3util.vset(rs + [f], str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(119):             return z3util.vset(rs + [f], str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(119):             return z3util.vset(rs + [f], str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(119):             return z3util.vset(rs + [f], str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(119):             return z3util.vset(rs + [f], str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(111):             return [(f, self.mk_bool(prefix)) for f in vars]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(111):             return [(f, self.mk_bool(prefix)) for f in vars]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(111):             return [(f, self.mk_bool(prefix)) for f in vars]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(111):             return [(f, self.mk_bool(prefix)) for f in vars]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(103):         return substitute(fml, subst)
+mini_ic3.py(85):         self.inputs += self.vars
+mini_ic3.py(86):         self.inputs = list(set(self.inputs))
+mini_ic3.py(87):         self.trans = pred
+mini_ic3.py(88):         return True
+mini_ic3.py(38):                 continue
+mini_ic3.py(27):         for r in fp.get_rules():
+mini_ic3.py(28):             if not is_quantifier(r):
+mini_ic3.py(30):             b = r.body()
+mini_ic3.py(31):             if not is_implies(b):
+mini_ic3.py(33):             f = b.arg(0)
+mini_ic3.py(34):             g = b.arg(1)
+mini_ic3.py(35):             if self.is_goal(f, g):
+ --- modulename: mini_ic3, funcname: is_goal
+mini_ic3.py(46):         if not self.is_pred(head, "Goal"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(48):         pred, inv = self.is_body(body)
+ --- modulename: mini_ic3, funcname: is_body
+mini_ic3.py(58):         if not is_and(body):
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(60):         fmls = [f for f in body.children() if self.is_inv(f) is None]
+mini_ic3.py(61):         inv = None
+mini_ic3.py(62):         for f in body.children():
+mini_ic3.py(63):             if self.is_inv(f) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(64):                 inv = f;
+mini_ic3.py(65):                 break
+mini_ic3.py(66):         return And(fmls), inv
+mini_ic3.py(49):         if pred is None:
+mini_ic3.py(51):         self.goal = self.subst_vars("x", inv, pred)
+ --- modulename: mini_ic3, funcname: subst_vars
+mini_ic3.py(101):         subst = self.mk_subst(prefix, inv)
+ --- modulename: mini_ic3, funcname: mk_subst
+mini_ic3.py(106):         self.index = 0
+mini_ic3.py(107):         if self.is_inv(inv) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(70):             return f
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+ --- modulename: mini_ic3, funcname: mk_bool
+mini_ic3.py(114):         self.index += 1
+mini_ic3.py(115):         return Bool("%s%d" % (prefix, self.index))
+mini_ic3.py(108):             return [(f, self.mk_bool(prefix)) for f in inv.children()]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(103):         return substitute(fml, subst)
+mini_ic3.py(52):         self.goal = self.subst_vars("i", self.goal, self.goal)
+ --- modulename: mini_ic3, funcname: subst_vars
+mini_ic3.py(101):         subst = self.mk_subst(prefix, inv)
+ --- modulename: mini_ic3, funcname: mk_subst
+mini_ic3.py(106):         self.index = 0
+mini_ic3.py(107):         if self.is_inv(inv) is not None:
+ --- modulename: mini_ic3, funcname: is_inv
+mini_ic3.py(69):         if self.is_pred(f, "Invariant"):
+ --- modulename: mini_ic3, funcname: is_pred
+mini_ic3.py(43):         return is_app(p) and p.decl().name() == name
+mini_ic3.py(71):         return None
+mini_ic3.py(110):             vars = self.get_vars(inv)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(122):                 rs = self.get_vars(f_, rs)
+ --- modulename: mini_ic3, funcname: get_vars
+mini_ic3.py(118):         if is_var(f):
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(121):             for f_ in f.children():
+mini_ic3.py(123):             return z3util.vset(rs, str)
+mini_ic3.py(111):             return [(f, self.mk_bool(prefix)) for f in vars]
+mini_ic3.py(102):         self.vars = [ v for (k,v) in subst ]
+mini_ic3.py(103):         return substitute(fml, subst)
+mini_ic3.py(53):         self.inputs += self.vars
+mini_ic3.py(54):         self.inputs = list(set(self.inputs))
+mini_ic3.py(55):         return True
+mini_ic3.py(36):                 continue
+mini_ic3.py(27):         for r in fp.get_rules():
+mini_ic3.py(378):     mp = MiniIC3(h2t.init, h2t.trans, h2t.goal, h2t.xs, h2t.inputs, h2t.xns)
+ --- modulename: mini_ic3, funcname: __init__
+mini_ic3.py(192):         self.x0 = x0
+mini_ic3.py(193):         self.inputs = inputs
+mini_ic3.py(194):         self.xn = xn
+mini_ic3.py(195):         self.init = init
+mini_ic3.py(196):         self.bad = goal
+mini_ic3.py(197):         self.trans = trans
+mini_ic3.py(198):         self.min_cube_solver = fd_solver()
+ --- modulename: mini_ic3, funcname: fd_solver
+mini_ic3.py(134):     s = SolverFor("QF_FD")
+mini_ic3.py(135):     s.set("sat.cardinality.solver", True)
+mini_ic3.py(136):     return s
+mini_ic3.py(199):         self.min_cube_solver.add(Not(trans))
+mini_ic3.py(200):         self.goals = []
+mini_ic3.py(201):         s = State(fd_solver())
+ --- modulename: mini_ic3, funcname: fd_solver
+mini_ic3.py(134):     s = SolverFor("QF_FD")
+mini_ic3.py(135):     s.set("sat.cardinality.solver", True)
+mini_ic3.py(136):     return s
+ --- modulename: mini_ic3, funcname: __init__
+mini_ic3.py(151):         self.R = set([])
+mini_ic3.py(152):         self.solver = s
+mini_ic3.py(202):         s.add(init)
+ --- modulename: mini_ic3, funcname: add
+mini_ic3.py(155):         if clause not in self.R:
+mini_ic3.py(156):            self.R |= { clause }
+mini_ic3.py(157):            self.solver.add(clause)
+mini_ic3.py(203):         s.solver.add(trans)
+mini_ic3.py(204):         self.states = [s]
+mini_ic3.py(205):         self.s_bad = fd_solver()
+ --- modulename: mini_ic3, funcname: fd_solver
+mini_ic3.py(134):     s = SolverFor("QF_FD")
+mini_ic3.py(135):     s.set("sat.cardinality.solver", True)
+mini_ic3.py(136):     return s
+mini_ic3.py(206):         self.s_good = fd_solver()
+ --- modulename: mini_ic3, funcname: fd_solver
+mini_ic3.py(134):     s = SolverFor("QF_FD")
+mini_ic3.py(135):     s.set("sat.cardinality.solver", True)
+mini_ic3.py(136):     return s
+mini_ic3.py(207):         self.s_bad.add(self.bad)
+mini_ic3.py(208):         self.s_good.add(Not(self.bad))        
+mini_ic3.py(379):     result = mp.run()    
+ --- modulename: mini_ic3, funcname: run
+mini_ic3.py(355):         if not check_disjoint(self.init, self.bad):
+ --- modulename: mini_ic3, funcname: check_disjoint
+mini_ic3.py(170):     s = fd_solver()
+ --- modulename: mini_ic3, funcname: fd_solver
+mini_ic3.py(134):     s = SolverFor("QF_FD")
+mini_ic3.py(135):     s.set("sat.cardinality.solver", True)
+mini_ic3.py(136):     return s
+mini_ic3.py(171):     s.add(a)
+mini_ic3.py(172):     s.add(b)
+mini_ic3.py(173):     return unsat == s.check()
+mini_ic3.py(357):         level = 0
+mini_ic3.py(358):         while True:
+mini_ic3.py(359):             inv = self.is_valid()
+ --- modulename: mini_ic3, funcname: is_valid
+mini_ic3.py(230):         i = 1
+mini_ic3.py(231):         while i + 1 < len(self.states):
+mini_ic3.py(235):         return None
+mini_ic3.py(360):             if inv is not None:
+mini_ic3.py(362):             is_sat, cube = self.unfold()
+ --- modulename: mini_ic3, funcname: unfold
+mini_ic3.py(261):         core = []
+mini_ic3.py(262):         self.s_bad.push()
+mini_ic3.py(263):         R = self.R(len(self.states)-1)
+ --- modulename: mini_ic3, funcname: R
+mini_ic3.py(226):         return And(self.states[i].R)
+mini_ic3.py(264):         self.s_bad.add(R)
+mini_ic3.py(265):         is_sat = self.s_bad.check()
+mini_ic3.py(266):         if is_sat == sat:
+mini_ic3.py(277):         self.s_bad.pop()
+mini_ic3.py(278):         return is_sat, core
+mini_ic3.py(363):             if is_sat == unsat:
+mini_ic3.py(364):                level += 1
+mini_ic3.py(365):                print("Unfold %d" % level)
+Unfold 1
+mini_ic3.py(366):                sys.stdout.flush()
+mini_ic3.py(367):                self.add_solver()
+ --- modulename: mini_ic3, funcname: add_solver
+mini_ic3.py(221):         s = fd_solver()
+ --- modulename: mini_ic3, funcname: fd_solver
+mini_ic3.py(134):     s = SolverFor("QF_FD")
+mini_ic3.py(135):     s.set("sat.cardinality.solver", True)
+mini_ic3.py(136):     return s
+mini_ic3.py(222):         s.add(self.trans)
+mini_ic3.py(223):         self.states += [State(s)]        
+ --- modulename: mini_ic3, funcname: __init__
+mini_ic3.py(151):         self.R = set([])
+mini_ic3.py(152):         self.solver = s
+mini_ic3.py(358):         while True:
+mini_ic3.py(359):             inv = self.is_valid()
+ --- modulename: mini_ic3, funcname: is_valid
+mini_ic3.py(230):         i = 1
+mini_ic3.py(231):         while i + 1 < len(self.states):
+mini_ic3.py(235):         return None
+mini_ic3.py(360):             if inv is not None:
+mini_ic3.py(362):             is_sat, cube = self.unfold()
+ --- modulename: mini_ic3, funcname: unfold
+mini_ic3.py(261):         core = []
+mini_ic3.py(262):         self.s_bad.push()
+mini_ic3.py(263):         R = self.R(len(self.states)-1)
+ --- modulename: mini_ic3, funcname: R
+mini_ic3.py(226):         return And(self.states[i].R)
+mini_ic3.py(264):         self.s_bad.add(R)
+mini_ic3.py(265):         is_sat = self.s_bad.check()
+mini_ic3.py(266):         if is_sat == sat:
+mini_ic3.py(267):            m = self.s_bad.model()
+mini_ic3.py(268):            cube = self.project0(m)
+ --- modulename: mini_ic3, funcname: project0
+mini_ic3.py(250):         return self.values2literals(m, self.x0)
+ --- modulename: mini_ic3, funcname: values2literals
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(240):             return x
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(269):            props = cube + self.projectI(m)
+ --- modulename: mini_ic3, funcname: projectI
+mini_ic3.py(253):         return self.values2literals(m, self.inputs)
+ --- modulename: mini_ic3, funcname: values2literals
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(241):         if is_false(value):
+mini_ic3.py(243):         return None
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(241):         if is_false(value):
+mini_ic3.py(243):         return None
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(241):         if is_false(value):
+mini_ic3.py(243):         return None
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(270):            self.s_good.push()
+mini_ic3.py(271):            self.s_good.add(R)
+mini_ic3.py(272):            is_sat2 = self.s_good.check(props)
+mini_ic3.py(273):            assert is_sat2 == unsat
+mini_ic3.py(274):            core = self.s_good.unsat_core()
+mini_ic3.py(275):            core = [c for c in core if c in set(cube)]
+mini_ic3.py(275):            core = [c for c in core if c in set(cube)]
+mini_ic3.py(276):            self.s_good.pop()
+mini_ic3.py(277):         self.s_bad.pop()
+mini_ic3.py(278):         return is_sat, core
+mini_ic3.py(363):             if is_sat == unsat:
+mini_ic3.py(368):             elif is_sat == sat:
+mini_ic3.py(369):                cex = self.ic3_blocked(cube, level)
+ --- modulename: mini_ic3, funcname: ic3_blocked
+mini_ic3.py(305):         self.push_heap(Goal(self.next(s0), None, f0))
+ --- modulename: mini_ic3, funcname: next
+mini_ic3.py(211):         if is_seq(f):
+ --- modulename: mini_ic3, funcname: is_seq
+mini_ic3.py(166):     return isinstance(f, list) or isinstance(f, tuple) or isinstance(f, AstVector)
+mini_ic3.py(212):            return [self.next(f1) for f1 in f]
+ --- modulename: mini_ic3, funcname: next
+mini_ic3.py(211):         if is_seq(f):
+ --- modulename: mini_ic3, funcname: is_seq
+mini_ic3.py(166):     return isinstance(f, list) or isinstance(f, tuple) or isinstance(f, AstVector)
+mini_ic3.py(213):         return substitute(f, zip(self.x0, self.xn))    
+mini_ic3.py(212):            return [self.next(f1) for f1 in f]
+ --- modulename: mini_ic3, funcname: __init__
+mini_ic3.py(161):         self.level = level
+mini_ic3.py(162):         self.cube = cube
+mini_ic3.py(163):         self.parent = parent
+ --- modulename: mini_ic3, funcname: push_heap
+mini_ic3.py(300):         heapq.heappush(self.goals, (goal.level, goal))
+mini_ic3.py(306):         while self.goals:
+mini_ic3.py(307):             f, g = heapq.heappop(self.goals)
+mini_ic3.py(308):             sys.stdout.write("%d." % f)
+1.mini_ic3.py(309):             sys.stdout.flush()
+mini_ic3.py(311):             if f == 0:
+mini_ic3.py(314):             cube, f, is_sat = self.is_inductive(f, g.cube)
+ --- modulename: mini_ic3, funcname: is_inductive
+mini_ic3.py(341):         s = self.states[f - 1].solver
+mini_ic3.py(342):         s.push()
+mini_ic3.py(343):         s.add(self.prev(Not(And(cube))))
+ --- modulename: mini_ic3, funcname: prev
+mini_ic3.py(216):         if is_seq(f):
+ --- modulename: mini_ic3, funcname: is_seq
+mini_ic3.py(166):     return isinstance(f, list) or isinstance(f, tuple) or isinstance(f, AstVector)
+mini_ic3.py(218):         return substitute(f, zip(self.xn, self.x0))    
+mini_ic3.py(344):         is_sat = s.check(cube)
+mini_ic3.py(345):         if is_sat == sat:
+mini_ic3.py(346):            m = s.model()
+mini_ic3.py(347):         s.pop()
+mini_ic3.py(348):         if is_sat == sat:
+mini_ic3.py(349):            cube = self.next(self.minimize_cube(self.project0(m), self.projectI(m), self.projectN(m)))
+ --- modulename: mini_ic3, funcname: project0
+mini_ic3.py(250):         return self.values2literals(m, self.x0)
+ --- modulename: mini_ic3, funcname: values2literals
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(241):         if is_false(value):
+mini_ic3.py(242):             return Not(x)
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+ --- modulename: mini_ic3, funcname: projectI
+mini_ic3.py(253):         return self.values2literals(m, self.inputs)
+ --- modulename: mini_ic3, funcname: values2literals
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(240):             return x
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(241):         if is_false(value):
+mini_ic3.py(242):             return Not(x)
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(241):         if is_false(value):
+mini_ic3.py(242):             return Not(x)
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+ --- modulename: mini_ic3, funcname: projectN
+mini_ic3.py(256):         return self.values2literals(m, self.xn)
+ --- modulename: mini_ic3, funcname: values2literals
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+ --- modulename: mini_ic3, funcname: value2literal
+mini_ic3.py(238):         value = m.eval(x)
+mini_ic3.py(239):         if is_true(value):
+mini_ic3.py(240):             return x
+mini_ic3.py(246):         p = [self.value2literal(m, x) for x in xs]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+mini_ic3.py(247):         return [x for x in p if x is not None]
+ --- modulename: mini_ic3, funcname: minimize_cube
+mini_ic3.py(292):         is_sat = self.min_cube_solver.check(lits + [c for c in cube] + [i for i in inputs])
+mini_ic3.py(292):         is_sat = self.min_cube_solver.check(lits + [c for c in cube] + [i for i in inputs])
+mini_ic3.py(292):         is_sat = self.min_cube_solver.check(lits + [c for c in cube] + [i for i in inputs])
+mini_ic3.py(292):         is_sat = self.min_cube_solver.check(lits + [c for c in cube] + [i for i in inputs])
+mini_ic3.py(292):         is_sat = self.min_cube_solver.check(lits + [c for c in cube] + [i for i in inputs])
+mini_ic3.py(293):         assert is_sat == unsat
+mini_ic3.py(294):         core = self.min_cube_solver.unsat_core()
+mini_ic3.py(295):         assert core
+mini_ic3.py(296):         return [c for c in core if c in set(cube)]
+mini_ic3.py(296):         return [c for c in core if c in set(cube)]
+mini_ic3.py(296):         return [c for c in core if c in set(cube)]
+mini_ic3.py(296):         return [c for c in core if c in set(cube)]
+mini_ic3.py(296):         return [c for c in core if c in set(cube)]
+mini_ic3.py(296):         return [c for c in core if c in set(cube)]
+ --- modulename: mini_ic3, funcname: next
+mini_ic3.py(211):         if is_seq(f):
+ --- modulename: mini_ic3, funcname: is_seq
+mini_ic3.py(166):     return isinstance(f, list) or isinstance(f, tuple) or isinstance(f, AstVector)
+mini_ic3.py(212):            return [self.next(f1) for f1 in f]
+ --- modulename: mini_ic3, funcname: next
+mini_ic3.py(211):         if is_seq(f):
+ --- modulename: mini_ic3, funcname: is_seq
+mini_ic3.py(166):     return isinstance(f, list) or isinstance(f, tuple) or isinstance(f, AstVector)
+mini_ic3.py(213):         return substitute(f, zip(self.x0, self.xn))    
+mini_ic3.py(212):            return [self.next(f1) for f1 in f]
+mini_ic3.py(352):         return cube, f, is_sat
+mini_ic3.py(315):             if is_sat == unsat:
+mini_ic3.py(319):             elif is_sat == sat:
+mini_ic3.py(320):                self.push_heap(Goal(cube, g, f - 1))
+ --- modulename: mini_ic3, funcname: __init__
+mini_ic3.py(161):         self.level = level
+mini_ic3.py(162):         self.cube = cube
+mini_ic3.py(163):         self.parent = parent
+ --- modulename: mini_ic3, funcname: push_heap
+mini_ic3.py(300):         heapq.heappush(self.goals, (goal.level, goal))
+mini_ic3.py(321):                self.push_heap(g)
+ --- modulename: mini_ic3, funcname: push_heap
+mini_ic3.py(300):         heapq.heappush(self.goals, (goal.level, goal))
+mini_ic3.py(306):         while self.goals:
+mini_ic3.py(307):             f, g = heapq.heappop(self.goals)
+mini_ic3.py(308):             sys.stdout.write("%d." % f)
+0.mini_ic3.py(309):             sys.stdout.flush()
+mini_ic3.py(311):             if f == 0:
+mini_ic3.py(312):                print("")
+
+mini_ic3.py(313):                return g
+mini_ic3.py(370):                if cex is not None:
+mini_ic3.py(371):                   return cex
+mini_ic3.py(380):     if isinstance(result, Goal):
+mini_ic3.py(381):        g = result
+mini_ic3.py(382):        print("Trace")
+Trace
+mini_ic3.py(383):        while g:
+mini_ic3.py(384):           print(g.level, g.cube)
+(0, [Not(xn1)])
+mini_ic3.py(385):           g = g.parent
+mini_ic3.py(383):        while g:
+mini_ic3.py(384):           print(g.level, g.cube)
+(1, [xn1])
+mini_ic3.py(385):           g = g.parent
+mini_ic3.py(383):        while g:
+mini_ic3.py(386):        return
