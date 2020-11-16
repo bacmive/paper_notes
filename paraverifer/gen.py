@@ -14,19 +14,19 @@ class TypeDef(object):
         self.typedefs = []
         # value range of each type
         self.typenames = {}
-        self.evaluate(text)  # a string of file (self.content)
+        self.evaluate(text)
     
     def evalEnum(self, text):
         enums = re.findall(r'(\w*?)\s*:\s*enum\s*\{(.*?)\}\s*;', text, re.S)
         for name, vstr in enums:
             values = filter(lambda x: x, map(lambda y: y.strip(), vstr.split(',')))
             for v in values: self.consts[v] = 0
-            self.const_defs += map(lambda v: 'let _%s = strc \"%s\"'%(v, v), values)  # let _I = strc "I" 
+            self.const_defs += map(lambda v: 'let _%s = strc \"%s\"'%(v, v), values)
             self.typedefs.append('enum \"%s\" [%s];'%(
                 name, 
-                '; '.join(map(lambda x: '_%s'%x, values))  # enum "state" [_I; _T; _C; _E];
+                '; '.join(map(lambda x: '_%s'%x, values))
             ))
-            self.typenames[name] = map(lambda x: '_%s'%x, values)  # "state" : [_I; _T; _C; _E]
+            self.typenames[name] = map(lambda x: '_%s'%x, values)
 
     def evalScalarset(self, text):
         scalarsets = re.findall(r'(\w*?)\s*:\s*(\w+?)\s*\.\.\s*(\w+?)\s*;', text, re.S)
@@ -37,23 +37,23 @@ class TypeDef(object):
             num2 = int(v2) if re.match(r'\d+', v2) else const2num(v2, text)
             self.typedefs.append('enum \"%s\" (int_consts [%s]);'%(
                 name,
-                '; '.join(map(lambda x: str(x), range(num1, num2 + 1)))  # enum "client" (int_consts [1; 2]);
+                '; '.join(map(lambda x: str(x), range(num1, num2 + 1)))
             ))
-            self.typenames[name] = map(lambda x: '(intc %d)'%x, range(num1, num2 + 1))  # "client" : ['(intc 1)', '(intc 2)']
+            self.typenames[name] = map(lambda x: '(intc %d)'%x, range(num1, num2 + 1))
 
     def evalBool(self):
-        self.const_defs += ['let _True = boolc true', 'let _False = boolc false']  # let _True = boolc true
-        self.typedefs.append('enum "boolean" [_True; _False];') # enum "boolean" [_True; _False];
-        self.typenames['boolean'] = ['_False', '_True']; # "boolean" : ['_False', '_True']
+        self.const_defs += ['let _True = boolc true', 'let _False = boolc false']
+        self.typedefs.append('enum "boolean" [_True; _False];')
+        self.typenames['boolean'] = ['_False', '_True'];
 
     def evaluate(self, text):
         self.evalEnum(text)
         self.evalScalarset(text)
         self.evalBool()
         self.value = '%s\n\n%s'%(
-            '\n'.join(self.const_defs),  
-            'let types = [\n%s\n]'%('\n'.join(map(lambda x: '  %s'%x, self.typedefs)))  # let types = [ ...
-        )  # for output
+            '\n'.join(self.const_defs),
+            'let types = [\n%s\n]'%('\n'.join(map(lambda x: '  %s'%x, self.typedefs)))
+        )
 
 
 
@@ -133,7 +133,7 @@ class Vardef(object):
 
     def judgeRecord(self, n, p, v):
         if v in self.typenames:
-            return '  [arrdef [(\"%s\", %s)] \"%s\"]'%(n, p, v) # [arrdef [("n", [paramdef "i0" "client"])] "state"];
+            return '  [arrdef [(\"%s\", %s)] \"%s\"]'%(n, p, v)
         else:
             return '  record_def \"%s\" %s _%s'%(n, p, v)
 
@@ -143,9 +143,9 @@ class Vardef(object):
             pattern = re.compile(r'array\s*\[(.+)\]\s*of\s*(.+)')
             param, t = pattern.findall(v)[0]
             index += 1
-            return self.judgeRecord(n, '[paramdef \"i%d\" \"%s\"]'%(index, param), t) 
+            return self.judgeRecord(n, '[paramdef \"i%d\" \"%s\"]'%(index, param), t)
         else:
-            return self.judgeRecord(n, '[]', v) # [arrdef [("x", [])] "boolean"]
+            return self.judgeRecord(n, '[]', v)
     
     def evaluate(self, text):
         vs = []
@@ -354,16 +354,16 @@ class Formula(object):
 
 
 
-    """
-        dealed with splitText() below 
-                
-         for i: client do
-            n[i] := I; 
-          endfor;
-          x := true;
-        ===>
-        ['for i: client do n[i] := I ; endfor', 'x := true']
-    """
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -373,7 +373,7 @@ class Statement(object):
         super(Statement, self).__init__()
         self.param_names = param_names
         self.consts = consts
-        self.statements = self.splitText(text) # text got fron statements Startstate
+        self.statements = self.splitText(text)
         self.value = self.evaluate(self.statements, self.param_names, self.consts)
 
     def splitText(self, text):
@@ -525,8 +525,8 @@ class Statement(object):
                     return '(assign %s %s)'%(v, e)
                 except:
                     logging.error('unable to handle statement: %s'%statement)
-        if len(statements) > 1:  # after splitText()
-            return '(parallel [%s])'%('; '.join(map(lambda s: inner(s), statements)))  #  (parallel [(forStatement (assign (arr [("n", [paramref "i"])]) (const _I)) [paramdef "i" "client"]); (assign (global "x") (const (boolc true)))])
+        if len(statements) > 1:
+            return '(parallel [%s])'%('; '.join(map(lambda s: inner(s), statements)))
         elif len(statements) == 1:
             return inner(statements[0])
         else:
@@ -601,7 +601,7 @@ class RuleSet(object):
         rules += self.singlerules(text, consts, map(lambda r: r.name, rules))
         self.value = '%s\n\nlet rules = [%s]'%(
             '\n\n'.join(map(lambda r: r.value, rules)), 
-            '; '.join(map(lambda r: r.name, rules))  # let n_Try =...
+            '; '.join(map(lambda r: r.name, rules))
         )
 
     def rulesets(self, text, consts):
@@ -690,8 +690,8 @@ class Invariant(object):
   let name = \"%s\" in
   let params = %s in
   let formula = %s in
-  prop name params formula'''%(name, name, param_defs, formula.value))  # let n_coherence =...
-        return names, invs 
+  prop name params formula'''%(name, name, param_defs, formula.value))
+        return names, invs
 
     def inv_alone(self, text, consts):
         # TODO problems exist here
@@ -708,7 +708,7 @@ class Invariant(object):
   let name = "%s" in
   let params = [] in
   let formula = %s in
-  prop name params formula'''%(name, name, formula.value)) 
+  prop name params formula'''%(name, name, formula.value))
         return names, invs
 
 
@@ -722,14 +722,14 @@ class Invariant(object):
 
 class Protocol(object):
     def __init__(self, name, filename):
-        self.name = escape(name)  # "mutualEx" -> "n_mutualEx"
+        self.name = escape(name)
         f = open(filename, 'r')
-        self.content = f.read()  # a string of file
+        self.content = f.read()
         f.close()
         self.evaluate()
 
     def evaluate(self):
-        types = TypeDef(self.content) 
+        types = TypeDef(self.content)
         records = Record(self.content, types.typenames)
         vardefs = Vardef(self.content, types.typenames)
         init = StartState(self.content, types.consts, types.typenames)
@@ -762,8 +762,50 @@ let protocol = {
     types.value, records.value, vardefs.value, init.value, 
     rulesets.value, invs.value, self.name, self.name)
 
-if __name__ == '__main__':
-    murphi = "mutualEx.m"
-    name = "mutualEx"
-    protocol = Protocol(name, murphi)
-    print protocol.value
+
+
+
+
+
+
+
+
+
+
+
+
+
+import getopt
+import sys
+import os
+
+
+help_msg = 'Usage: python gen.py [-n|-m|-h] for [--name|--murphi|--help]\n'
+
+try:
+    opts, args = getopt.getopt(sys.argv[1:], 'n:m:h', ['name=', 'murphi=', 'help'])
+    name = None
+    murphi = None
+    for opt, arg in opts:
+        if opt in ('-h', '--help'):
+            sys.stdout.write(help_msg)
+            sys.exit()
+        elif opt in ('-n', '--name'):
+            name = arg
+        elif opt in ('-m', '--murphi'):
+            murphi = arg
+        else:
+            sys.stderr.write(help_msg)
+            sys.exit()
+    if murphi is not None and os.path.isfile(murphi):
+        basename = os.path.basename(murphi)
+        if name is None:
+            name = basename if len(basename.split('.')) == 1 else '.'.join(basename.split('.')[:-1])
+        protocol = Protocol(name, murphi)
+        print protocol.value
+    else:
+        sys.stderr.write(help_msg)
+        sys.exit()
+except getopt.GetoptError:
+    sys.stderr.write(help_msg)
+    sys.exit()
