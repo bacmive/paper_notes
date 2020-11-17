@@ -1,0 +1,43 @@
+MODULE main()
+
+VAR
+	p1 : {Idle, Try, Crit, Exit};
+	p2 : {Idle, Try, Crit, Exit};
+	x : boolean;
+
+
+ASSIGN
+	init(p1) := Idle;
+	init(p2) := Idle;
+	init(x) := TRUE;
+
+	next(p1) :=
+		case
+			p1 = Idle :{Idle, Try};
+			p1 = Try & x = TRUE : Crit;
+			p1 = Crit : {Crit, Exit};
+			p1 = Exit : Idle;
+			TRUE : p1;
+		esac;
+
+	next(p2) :=
+		case
+			p2 = Idle :{Idle, Try};
+			p2 = Try & x = TRUE : Crit;
+			p2 = Crit : {Crit, Exit};
+			p2 = Exit : Idle;
+			TRUE : p2;
+		esac;
+
+	next(x) :=
+		case 
+			p1 = Try :FALSE;
+			p2 = Try : FALSE;
+			p1 = Exit : TRUE;
+			p2 = Exit : TRUE;
+			TRUE : x;
+		esac;
+
+
+ INVARSPEC
+ 	!(p1 = Crit & p2 = Crit);

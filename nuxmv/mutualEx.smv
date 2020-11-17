@@ -1,0 +1,40 @@
+MODULE main()
+
+VAR
+	arr : array 0..1 of {Idle, Try, Crit, Exit};
+	x : boolean;
+
+ASSIGN
+	init(arr[0]) := Idle;
+	init(arr[1]) := Idle;
+	init(x) := TRUE;
+
+DEFINE
+	trying0 := arr[0] = Idle;
+	trying1 := arr[1] = Idle;
+	
+	critical0 := ( arr[0] = Try & x = TRUE);
+	critical1 := ( arr[1] = Try & x = TRUE);
+
+	exit0 := arr[0] = Crit;
+	exit1 := arr[1] = Crit;
+
+	idle0 := arr[0] = Exit;
+	idle1 := arr[1] = Exit;
+
+
+TRANS
+	case
+		trying0 : next(arr[0]) = Try;
+		trying1 : next(arr[1]) = Try;
+		critical0 : next(arr[0]) = Crit & next(x) = FALSE;
+		critical1 : next(arr[1]) = Crit & next(x) = FALSE;
+		exit0 : next(arr[0]) = Exit;
+		exit1 : next(arr[1]) = Exit;
+		idle0 : next(arr[0]) = Idle & next(x) = TRUE; 
+		idle1 : next(arr[1]) = Idle & next(x) = TRUE;
+		TRUE : next(arr[0]) = arr[0] & next(arr[1]) = arr[1] & next(x) = x;
+   	esac;
+
+ INVARSPEC
+ 	!(arr[0] = Crit & arr[1] = Crit);

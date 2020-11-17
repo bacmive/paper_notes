@@ -1,0 +1,155 @@
+ --- modulename: test1, funcname: <module>
+test1.py(2): from z3 import *
+test1.py(3): from pdr import PDR
+ --- modulename: pdr, funcname: <module>
+pdr.py(5): from z3 import *
+pdr.py(8): class tCube(object):
+ --- modulename: pdr, funcname: tCube
+pdr.py(8): class tCube(object):
+pdr.py(10):     def __init__(self, model, lMap, t = None):
+pdr.py(15):     def cube(self):
+pdr.py(18):     def __repr__(self):
+pdr.py(22): class PDR(object):
+ --- modulename: pdr, funcname: PDR
+pdr.py(22): class PDR(object):
+pdr.py(23):     def __init__(self, literals, primes, init, trans, post):
+pdr.py(32):     def run(self):
+pdr.py(59):     def checkForInduction(self):
+pdr.py(70):     def recBlockCube(self, s0):
+pdr.py(97):     def solveRelative(self, tcube):
+pdr.py(112):     def getBadCube(self):
+pdr.py(122):     def isBlocked(self, tcube, t):
+pdr.py(128):     def isInitial(self, cube, initial):
+test1.py(5): def ExampleOne():
+test1.py(28): if __name__ == "__main__":
+test1.py(29): 	solver = PDR(*ExampleOne())
+ --- modulename: test1, funcname: ExampleOne
+test1.py(6): 	x = Bool('x')
+test1.py(7): 	y = Bool('y')
+test1.py(8): 	z = Bool('z')
+test1.py(9): 	xp = Bool('xp')
+test1.py(10): 	yp = Bool('yp')
+test1.py(11): 	zp = Bool('zp')
+test1.py(13): 	variables = [x,y,z]
+test1.py(14): 	primes = [xp, yp, zp]
+test1.py(15): 	init = And(x, y, Not(z))
+test1.py(16): 	trans = And(
+test1.py(17): 				Or(Not(x), zp),
+test1.py(18): 				Or(x, Not(zp)),
+test1.py(19): 				Or(y, Not(yp)),
+test1.py(20): 				Or(Not(x), Not(y), Not(xp)),
+test1.py(21): 				Or(Not(z), xp, x),
+test1.py(22): 				Or(Not(z), xp, y)
+test1.py(24): 	post = Or(Not(x), Not(y), Not(z))
+test1.py(25): 	return (variables, primes, init, trans, post)
+ --- modulename: pdr, funcname: __init__
+pdr.py(24):         self.init = init
+pdr.py(25):         self.trans = trans
+pdr.py(26):         self.literals = literals
+pdr.py(27):         self.lMap = {str(l):l for l in self.literals}
+ --- modulename: pdr, funcname: <dictcomp>
+pdr.py(27):         self.lMap = {str(l):l for l in self.literals}
+pdr.py(27):         self.lMap = {str(l):l for l in self.literals}
+pdr.py(27):         self.lMap = {str(l):l for l in self.literals}
+pdr.py(27):         self.lMap = {str(l):l for l in self.literals}
+pdr.py(28):         self.post = post
+pdr.py(29):         self.R = []
+pdr.py(30):         self.primeMap = zip(literals, primes)
+test1.py(30): 	solver.run()
+ --- modulename: pdr, funcname: run
+pdr.py(33):         self.R = list()
+pdr.py(34):         self.R.append(self.init)
+pdr.py(36):         while(1==1):
+pdr.py(37):             c = self.getBadCube()
+ --- modulename: pdr, funcname: getBadCube
+pdr.py(113):         model = And(Not(self.post), self.R[-1])
+pdr.py(114):         s = Solver()
+pdr.py(115):         s.add (model)
+pdr.py(116):         if(s.check() == sat):
+pdr.py(119):             return None
+pdr.py(38):             if(c != None):
+pdr.py(51):                 inv = self.checkForInduction()
+ --- modulename: pdr, funcname: checkForInduction
+pdr.py(60):         for frame in self.R:
+pdr.py(61):             s=Solver()
+pdr.py(62):             s.add(self.trans)
+pdr.py(63):             s.add(frame)
+pdr.py(64):             s.add(Not(substitute(frame, self.primeMap)))
+pdr.py(65):             if s.check() == unsat:
+pdr.py(60):         for frame in self.R:
+pdr.py(67):         return None
+pdr.py(52):                 if inv != None:
+pdr.py(55):                 print "Did not find invariant, adding frame", len(self.R)
+Did not find invariant, adding frame 1
+pdr.py(56):                 self.R.append(True)
+pdr.py(36):         while(1==1):
+pdr.py(37):             c = self.getBadCube()
+ --- modulename: pdr, funcname: getBadCube
+pdr.py(113):         model = And(Not(self.post), self.R[-1])
+pdr.py(114):         s = Solver()
+pdr.py(115):         s.add (model)
+pdr.py(116):         if(s.check() == sat):
+pdr.py(117):             return tCube(s.model(), self.lMap, len(self.R) - 1)
+ --- modulename: pdr, funcname: __init__
+pdr.py(11):         self.t = t
+pdr.py(13):         self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+pdr.py(13):         self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+pdr.py(13):         self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+pdr.py(13):         self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+pdr.py(38):             if(c != None):
+pdr.py(43):                 trace = self.recBlockCube(c)
+ --- modulename: pdr, funcname: recBlockCube
+pdr.py(71):         Q = []
+pdr.py(72):         Q.append(s0);
+pdr.py(73):         while (len(Q) > 0):
+pdr.py(74):             s = Q[-1]
+pdr.py(75):             if (s.t == 0):
+pdr.py(81):             z = self.solveRelative(s)
+ --- modulename: pdr, funcname: solveRelative
+pdr.py(98):         cubeprime = substitute(tcube.cube(), self.primeMap)
+ --- modulename: pdr, funcname: cube
+pdr.py(16):         return And(*self.cubeLiterals)
+pdr.py(99):         s = Solver()
+pdr.py(100):         s.add(self.R[tcube.t-1])
+pdr.py(101):         s.add(self.trans)
+pdr.py(102):         s.add(cubeprime)
+pdr.py(103):         if(s.check() != unsat): #cube was not blocked, return new tcube containing the model
+pdr.py(106):         return None
+pdr.py(83):             if (z == None):
+pdr.py(86):                 Q.pop() #remove cube s from Q 
+pdr.py(87):                 for i in range(1, s.t+1):
+pdr.py(89):                     self.R[i] = And(self.R[i], Not(s.cube()))
+ --- modulename: pdr, funcname: cube
+pdr.py(16):         return And(*self.cubeLiterals)
+pdr.py(87):                 for i in range(1, s.t+1):
+pdr.py(73):         while (len(Q) > 0):
+pdr.py(94):         return None
+pdr.py(44):                 if trace != None:
+pdr.py(36):         while(1==1):
+pdr.py(37):             c = self.getBadCube()
+ --- modulename: pdr, funcname: getBadCube
+pdr.py(113):         model = And(Not(self.post), self.R[-1])
+pdr.py(114):         s = Solver()
+pdr.py(115):         s.add (model)
+pdr.py(116):         if(s.check() == sat):
+pdr.py(119):             return None
+pdr.py(38):             if(c != None):
+pdr.py(51):                 inv = self.checkForInduction()
+ --- modulename: pdr, funcname: checkForInduction
+pdr.py(60):         for frame in self.R:
+pdr.py(61):             s=Solver()
+pdr.py(62):             s.add(self.trans)
+pdr.py(63):             s.add(frame)
+pdr.py(64):             s.add(Not(substitute(frame, self.primeMap)))
+pdr.py(65):             if s.check() == unsat:
+pdr.py(60):         for frame in self.R:
+pdr.py(61):             s=Solver()
+pdr.py(62):             s.add(self.trans)
+pdr.py(63):             s.add(frame)
+pdr.py(64):             s.add(Not(substitute(frame, self.primeMap)))
+pdr.py(65):             if s.check() == unsat:
+pdr.py(66):                 return frame
+pdr.py(52):                 if inv != None:
+pdr.py(53):                     print "Found inductive invariant:", simplify(inv)
+Found inductive invariant: Not(And(z, y, x))
+pdr.py(54):                     return True
