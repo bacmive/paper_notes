@@ -27,41 +27,64 @@ if(s.check() == sat):
 	# print s
 	m = s.model()
 	print m
-	# for l in m:
-		# print l
+	for l in m:
+		print l
 	cubeLiterals = [lMap[str(l)] == m[l] for l in m if '\'' not in str(l)]
-	# pprint(cubeLiterals)
-	# pprint(And(*cubeLiterals))
+	no_primes = [l for l in m if '\'' not in str(l)]
+	cubes = [lMap[str(l)] if m[l]==True else Not(lMap[str(l)]) for l in no_primes]
+	pprint(cubeLiterals)
+	pprint(cubes)
+	pprint(And(*cubeLiterals))
+	pprint(And(*cubes))
 
 
 
 
 
-class Cube:
-    def __init__(self, model, lMap):
-        #filter out primed variables when creating cube
-        self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
-    # return the conjection of all literals in this cube
-    def cube(self):
-        return And(*self.cubeLiterals)
-    def __repr__(self):
-        return str(sorted(self.cubeLiterals, key=str)) 
+# def clauses(formula):
+#     #  from https://stackoverflow.com/a/18003288/1911064
+#     g = Goal()
+#     g.add(formula)
+#     # use describe_tactics() to get to know the tactics available
+#     t = Tactic('tseitin-cnf')
+#     clauses = t(g)
+#     return clauses[0]
+
+# cls = clauses(And(True))
+# print "the clauses in True( " + str(And(True))  + " )is: "
+# for c in cls:
+# 	print c
 
 
-def is_sat(formula):
-        s = Solver()
-        s.add(formula)
-        if s.check() == sat:
-            return Cube(s.model(), lMap)
-        else:
-            return None
 
-# print substitute(is_sat(model).cube(), primeMap)
 
-s = is_sat(model).cube()
+
+
+# class Cube:
+#     def __init__(self, model, lMap):
+#         #filter out primed variables when creating cube
+#         self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+#     # return the conjection of all literals in this cube
+#     def cube(self):
+#         return And(*self.cubeLiterals)
+#     def __repr__(self):
+#         return str(sorted(self.cubeLiterals, key=str)) 
+
+
+# def is_sat(formula):
+#         s = Solver()
+#         s.add(formula)
+#         if s.check() == sat:
+#             return Cube(s.model(), lMap)
+#         else:
+#             return None
+
+# # print substitute(is_sat(model).cube(), primeMap)
+
+# s = is_sat(model).cube()
 # print is_sat(And(init, Not(s), trans, substitute(s, primeMap))) # None
-print is_sat(And(And(True, Not(s)), And(Not(s)), trans, Not(substitute(And(Not(s)), primeMap))))
-print is_sat(And(And(True, Not(s)), And(True), trans, Not(substitute(And(True), primeMap))))
+# print is_sat(And(And(True, Not(s)), And(Not(s)), trans, Not(substitute(And(Not(s)), primeMap))))
+# print is_sat(And(And(True, Not(s)), And(True), trans, Not(substitute(And(True), primeMap))))
 
 
 # F = list()

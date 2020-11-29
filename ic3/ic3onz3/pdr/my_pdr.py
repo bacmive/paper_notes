@@ -1,18 +1,23 @@
 #!/usr/bin/python
 
 # Implementation of the PDR algorithm by Peter Den Hartog. Apr 28, 2016
+# reference: http://z3prover.github.io/api/html/namespacez3py.html; http://theory.stanford.edu/~nikolaj/programmingz3.html#sec-cores
 
 from z3 import *
+import sys
+import pprint
 
 class Cube:
     def __init__(self, model, lMap):
         #filter out primed variables when creating cube
-        self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+        # self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+        self.no_primes = [l for l in model if '\'' not in str(l)]
+        self.cubes = [lMap[str(l)] if model[l]==True else Not(lMap[str(l)]) for l in self.no_primes]
     # return the conjection of all literals in this cube
     def cube(self):
-        return And(*self.cubeLiterals)
+        return And(*self.cubes)
     def __repr__(self):
-        return str(sorted(self.cubeLiterals, key=str)) 
+        return str(sorted(self.cubes, key=str)) 
 
 
 class PDR(object):
@@ -25,16 +30,13 @@ class PDR(object):
         self.F = []
         self.primeMap = zip(literals, primes)
 
-    def Fs(self, k):
-        return And(self.F[k])
-
     def run(self):
         if self.violateInit():
             print "violation in the initial state:   " + str(self.init)
             return False
         self.F = list()
-        self.F.append([self.init])
-        self.F.append([True])
+        self.F.append(self.init)
+        self.F.append(True)
         self.k = 1
 
         while True :
@@ -42,8 +44,10 @@ class PDR(object):
             while True:
                 # if F[k]/\!P is sat, then assign c to the cube extracted from the model
                 # else c is None and break the while loop
-                c = self.is_sat(And(self.Fs(self.k), Not(self.post)))
+                # print "the formula is:   ",And(self.F[self.k], Not(self.post))
+                c = self.is_sat(And(self.F[self.k], Not(self.post)))
                 if c!=None :
+                    # print "ther return cube:    ",c.cube()
                     if not self.recBlock(c, self.k):
                         print "Didn't find inductive invariants"
                         return False
@@ -52,17 +56,30 @@ class PDR(object):
 
             #propagation phase
             self.k += 1
-            self.F.append([True])
+            self.F.append(True)
             for i in range(1, self.k):  # from 1 to k-1
-                for clause in self.F[i]:
+                for clause in self.clauses(self.F[i]):
                     # if F[i]/\c/\T/\!c' is not sat( equally F/\c/\T => c' is sat )
                     # then c is inductive relative to the F[i]
                     # then propagate c to the F[i+1]
-                    if None==self.is_sat(And(self.Fs(i), And(clause), self.trans, Not(substitute(And(clause), self.primeMap)))):
-                        self.F[i+1].append(clause)
-                if is_eq(self.Fs(i)==self.Fs(i+1)):
-                    print "the inductive invariant is:  ", simplify((self.Fs(i)))
-                    return True
+                    # print clause
+                    if None==self.is_sat(And(self.F[i], clause, self.trans, Not(substitute(clause, self.primeMap)))):
+                        # print And(self.F[i], clause, self.trans, Not(substitute(clause, self.primeMap)))
+                        # print "Propogating"
+                        # print "add clause " + str(clause) + " to Frame " + str(i+1)
+                        self.F[i+1] = And(self.F[i+1], clause)
+            # print "-----Frames------"
+            # for item in self.F:
+                # print item
+            # print "-----------------"
+                # if is_eq(self.F[i]==self.F[i+1]):
+                #     print "the indcutive invariant is: ", simplify(self.F[i])
+                #     return True
+
+            inv = self.checkForInduction()
+            if inv!=None :
+                print "the inductive invariant is:  ", simplify(inv)
+                return True
 
     def recBlock(self, s, i):
         if i == 0:
@@ -71,17 +88,42 @@ class PDR(object):
             # if F[i-1]/\!s/\T/\s' is sat( equally F[i-1]/\!s/\T => !s' is not sat)
             # then extract a cube c from the model
             # else c is None, then break the while loop
-            c = self.is_sat(And(self.Fs(i-1), Not(s.cube()), self.trans, substitute(s.cube(),self.primeMap)))
+            print "the formula tested in reckBlock: " + str(And(self.F[i-1], Not(s.cube())  , self.trans, substitute(s.cube(),self.primeMap)))
+            c = self.is_sat(And(self.F[i-1], Not(s.cube())  , self.trans, substitute(s.cube(),self.primeMap)))
             # print "at " + str(i) + " c is None ?  " + str(c==None)
             if c!=None:
+                print "the cube to be blocked: " + str(c.cube())
                 if not recBlock(c, i-1):
                     return False
             else:
                 break
         # g = self.generalize(Not(s.cube()), i)
         for j in range(1, i+1):  # from 1 to i
-            self.F[j].append(Not(s.cube()))
+            # print "add cube " + str(Not(s.cube())) + " to Frame " + str(j)
+            self.F[j] = And(self.F[j], Not(s.cube()))
         return True
+
+    def clauses(self, formula):
+        #  from https://stackoverflow.com/a/18003288/1911064
+        g = Goal()
+        g.add(formula)
+        # use describe_tactics() to get to know the tactics available
+        t = Tactic('tseitin-cnf')
+        clauses = t(g)
+        return clauses[0]
+
+
+
+    # Check all images in F to see if one is inductive  
+    def checkForInduction(self):
+        for frame in self.F:
+            s=Solver()
+            s.add(self.trans)
+            s.add(And(frame))
+            s.add(Not(substitute(And(frame), self.primeMap)))
+            if s.check() == unsat:
+                return And(frame)
+        return None
    
     def violateInit(self):
         if None==self.is_sat(And(self.init, Not(self.post))):
@@ -91,10 +133,18 @@ class PDR(object):
 
 
     def is_sat(self, formula):
+        # print ("--- called by function      ", sys._getframe().f_back.f_code.co_name)
+        # print ("--- called at line          ", sys._getframe().f_back.f_lineno)
         s = Solver()
+        # print id(s)
         s.add(formula)
+        # print s
         if s.check() == sat:
-            return Cube(s.model(), self.lMap)
+            c = Cube(s.model(), self.lMap)
+            # print c
+            s.reset()
+            return c
         else:
+            s.reset()
             return None
 
