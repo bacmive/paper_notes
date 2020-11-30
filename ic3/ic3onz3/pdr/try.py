@@ -26,17 +26,27 @@ s.add (model)
 if(s.check() == sat):
 	# print s
 	m = s.model()
-	print m
-	for l in m:
-		print l
+	# print m
+	# for l in m:
+	# 	print l
 	cubeLiterals = [lMap[str(l)] == m[l] for l in m if '\'' not in str(l)]
 	no_primes = [l for l in m if '\'' not in str(l)]
 	cubes = [lMap[str(l)] if m[l]==True else Not(lMap[str(l)]) for l in no_primes]
-	pprint(cubeLiterals)
-	pprint(cubes)
-	pprint(And(*cubeLiterals))
-	pprint(And(*cubes))
+	# pprint(cubeLiterals)
+	# pprint(cubes)
+	# pprint(And(*cubeLiterals))
+	# pprint(And(*cubes))
 
+
+
+
+
+
+
+
+# print prove(post == init)
+# print prove(post == And(True))
+# print is_eq(post == And(True))
 
 
 
