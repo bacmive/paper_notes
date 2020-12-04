@@ -16,7 +16,7 @@ post = Not(And(*[variables[0], Not(variables[1])]))
 # if is_eq(post1==post):
 	# print "yes"
 primeMap = zip(variables, primes)
-
+toLiterals = zip(primes, variables)
 lMap = {str(l):l for l in variables}
 
 model = And(Not(post), True)
@@ -32,12 +32,22 @@ if(s.check() == sat):
 	cubeLiterals = [lMap[str(l)] == m[l] for l in m if '\'' not in str(l)]
 	no_primes = [l for l in m if '\'' not in str(l)]
 	cubes = [lMap[str(l)] if m[l]==True else Not(lMap[str(l)]) for l in no_primes]
+
 	# pprint(cubeLiterals)
 	# pprint(cubes)
+	for lit in cubes:
+		print substitute(substitute(lit, primeMap), toLiterals)
 	# pprint(And(*cubeLiterals))
 	# pprint(And(*cubes))
 
 
+
+
+
+# s.check(variables)
+# core = s.unsat_core()
+# core = list(core)
+# print core
 
 
 

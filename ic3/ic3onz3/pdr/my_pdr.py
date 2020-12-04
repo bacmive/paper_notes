@@ -6,18 +6,44 @@
 from z3 import *
 import sys
 import pprint
-
+from copy import deepcopy
+from random import choice
+# class Cube:
+#     def __init__(self, model, lMap):
+#         #filter out primed variables when creating cube
+#         # self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
+#         self.no_primes = [l for l in model if '\'' not in str(l)]
+#         self.cubes = [lMap[str(l)] if model[l]==True else Not(lMap[str(l)]) for l in self.no_primes]
+#     # return the conjection of all literals in this cube
+#     def cube(self):
+#         return And(*self.cubes)
+#     def __repr__(self):
+#         return str(sorted(self.cubes, key=str)) 
 class Cube:
-    def __init__(self, model, lMap):
-        #filter out primed variables when creating cube
-        # self.cubeLiterals = [lMap[str(l)] == model[l] for l in model if '\'' not in str(l)]
-        self.no_primes = [l for l in model if '\'' not in str(l)]
-        self.cubes = [lMap[str(l)] if model[l]==True else Not(lMap[str(l)]) for l in self.no_primes]
+    def __init__(self):
+        self.literals = []     
+    
     # return the conjection of all literals in this cube
+    def from_model(self, model, lMap):
+        no_primes = [l for l in model if '\'' not in str(l)]
+        self.literals = [lMap[str(l)] if model[l]==True else Not(lMap[str(l)]) for l in no_primes]
+        return self
+
+    def from_list(self, lits):
+        self.literals = lits
+        return self
+    
     def cube(self):
-        return And(*self.cubes)
+        if not (self.literals):
+            return And(True)
+        return And(*self.literals)
+    
+    def get_literals(self):
+        return self.literals
+
     def __repr__(self):
-        return str(sorted(self.cubes, key=str)) 
+        return str(sorted(self.literals, key=str)) 
+
 
 
 class PDR(object):
@@ -29,6 +55,8 @@ class PDR(object):
         self.post = post
         self.F = []
         self.primeMap = zip(literals, primes)
+        self.toLiterals = zip(primes, literals)
+        self.max_iter = 4
 
     def run(self):
         if self.violateInit():
@@ -47,7 +75,7 @@ class PDR(object):
                 # print "the formula is:   ",And(self.F[self.k], Not(self.post))
                 # print "the formula in blocking    to check: ", And(self.F[self.k], Not(self.post))
                 c = self.is_sat(And(self.F[self.k], Not(self.post)))
-                if c!=None :
+                if isinstance(c, Cube) :
                     # print "ther return cube:    ",c.cube()
                     if not self.recBlock(c, self.k):
                         print "Didn't find inductive invariants"
@@ -59,13 +87,13 @@ class PDR(object):
             self.k += 1
             self.F.append(True)
             for i in range(1, self.k):  # from 1 to k-1
-                for clause in self.clauses(self.F[i]):
+                for clause in self.get_clauses(self.F[i]):
                     # if F[i]/\c/\T/\!c' is not sat( equally F/\c/\T => c' is sat )
                     # then c is inductive relative to the F[i]
                     # then propagate c to the F[i+1]
                     # print clause
                     # print "the formula in propagation to check: ", And(self.F[i], clause, self.trans, Not(substitute(clause, self.primeMap)))
-                    if None==self.is_sat(And(self.F[i], clause, self.trans, Not(substitute(clause, self.primeMap)))):
+                    if not isinstance(self.is_sat(And(self.F[i], clause, self.trans, Not(substitute(clause, self.primeMap)))), Cube):
                         # print And(self.F[i], clause, self.trans, Not(substitute(clause, self.primeMap)))
                         # print "Propogating"
                         # print "add clause " + str(clause) + " to Frame " + str(i+1)
@@ -93,20 +121,22 @@ class PDR(object):
             # print "the formula in recblock    to check: ", And(self.F[i-1], Not(s.cube())  , self.trans, substitute(s.cube(),self.primeMap))
             c = self.is_sat(And(self.F[i-1], Not(s.cube())  , self.trans, substitute(s.cube(),self.primeMap)))
             # print "at " + str(i) + " c is None ?  " + str(c==None)
-            if c!=None:
+            if isinstance(c,Cube):
                 # print "the cube to be blocked: " + str(c.cube())
                 if not self.recBlock(c, i-1):
                     return False
             else:
                 break
-        # g = self.generalize(Not(s.cube()), i)
+        g = self.generalize(s, i)
+        # print "after generalize: ", g
         for j in range(1, i+1):  # from 1 to i
             # print "add cube " + str(Not(s.cube())) + " to Frame " + str(j)
-            self.F[j] = And(self.F[j], Not(s.cube()))
+            self.F[j] = And(self.F[j], Not(g.cube()))
         return True
 
-    def clauses(self, formula):
-        #  from https://stackoverflow.com/a/18003288/1911064
+    def get_clauses(self, formula):
+        # from https://stackoverflow.com/a/18003288/1911064
+        # from https://stackoverflow.com/questions/65047040/how-to-get-every-clauses-of-a-cnf-formula-in-z3?noredirect=1&lq=1
         g = Goal()
         g.add(formula)
         # use describe_tactics() to get to know the tactics available
@@ -137,30 +167,62 @@ class PDR(object):
         #     if s.check() == unsat:
         #         return And(frame)
         return None
-   
+   	
+
+    # Inductive Clause Generalization
+    def generalize(self, c, i):
+        c = c.get_literals()
+
+    	for r in range(1, self.max_iter):
+            for l in c:
+                g = deepcopy(c)
+                g.remove(l)
+                init_check = self.is_sat(And(self.init, And(*g)))
+                induc_check = self.is_sat(And(self.F[i],self.trans, Not(And(*g))), [substitute(l, self.primeMap) for l in g])
+                # print "init_check is: ", init_check
+                # print "induc_check is: ", induc_check
+                # print "if not isinstance(init_check, Cube)): ", str(not isinstance(init_check, Cube))
+                # print "if not isinstance(induc_check, Cube): ", str(not isinstance(induc_check, Cube))
+
+                if (not isinstance(init_check, Cube)) and (not isinstance(induc_check, Cube)):
+                    cc = [substitute(l, self.toLiterals) for l in list(induc_check)]
+                    # print "flag"
+                    while True:
+                        init_check2 = self.is_sat(And(And(*cc), self.init))
+                        if isinstance(init_check2,Cube):
+                            print "set(g): ", set(g)
+                            print "set(cc): ", set(cc)
+                            lit = choice((list(set(g).difference(set(cc)))))
+                            cc.append(lit)
+                        else:
+                            break
+                    return Cube().from_list(cc)
+        return Cube().from_list(c)
+
+
     def violateInit(self):
         # print "the formula in violateInit to check: ", And(self.init, Not(self.post))
-        if None==self.is_sat(And(self.init, Not(self.post))):
-            return False
-        else:
+        if isinstance(self.is_sat(And(self.init, Not(self.post))), Cube):
             return True
+        else:
+            return False
 
 
-    def is_sat(self, formula):
+    def is_sat(self, formula, assumption=[]):
         # print ("--- called by function      ", sys._getframe().f_back.f_code.co_name)
         # print ("--- called at line          ", sys._getframe().f_back.f_lineno)
         s = Solver()
         # print id(s)
         s.add(And(formula))
         # print s
-        if s.check() == sat:
-            c = Cube(s.model(), self.lMap)
+        if s.check(assumption) == sat:
+            c = Cube().from_model(s.model(), self.lMap)
             # print c
             # s.reset()
             return c
         else:
             # s.reset()
-            return None
+            return s.unsat_core()
 
     def equiv(self, claim):
         s = Solver()
