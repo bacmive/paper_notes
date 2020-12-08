@@ -68,7 +68,7 @@ char solver_cli[SOLVER_NAME_MAX * 2];
 PicoSAT *solver;
 
 static void
-die (const char * fmt, ...)
+die (const char * fmt, ...) // (const char* fmt,...) or (const char * str)
 {
   va_list ap;
   fprintf (stderr, "*** k-ind_aig: ");
@@ -590,7 +590,9 @@ main (int argc, char ** argv)
 
   start = picosat_time_stamp ();
 
-  snprintf(solver_name, SOLVER_NAME_MAX, "glucose");
+  //int snprintf ( char * str, size_t size, const char * format, ... );
+  //int snprintf ( char * str, size_t size, const char * str);
+  snprintf(solver_name, SOLVER_NAME_MAX, "glucose");  
 
   for (i = 1; i < argc; i++)
     {
