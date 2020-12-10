@@ -92,7 +92,7 @@ class PDR(object):
 					s1.reset()
 
 					if not self.recBlock(c, self.k):
-						print "Didn't find inductive invariants"
+						# print "Didn't find inductive invariants"
 						return False
 				else:
 					s1.reset()
@@ -135,7 +135,8 @@ class PDR(object):
 
 				inv = self.checkFixedpoint(self.F[i], self.F[i + 1])
 				if inv != None:
-					print "the inductive invariant is:  ", simplify(inv)
+					# print "the inductive invariant is:  ", simplify(inv)
+					self.checkForInvariant(simplify(inv))
 					return True
 				# if self.equiv(self.F[i]==self.F[i+1]):
 					# print "the inductive invariant is: ", simplify(F[i])
@@ -297,6 +298,16 @@ class PDR(object):
 
 
 
+	def checkForInvariant(self, inv):
+		c1 =Solver()
+		c1.add(And(self.init, Not(inv)))
+		c2 = Solver()
+		c2.add(And(inv, self.trans, Not(substitute(inv, self.primeMap))))
+		if not c1.check()==sat and not c2.check()==sat:
+			print "find the reliable invariant"
+		else:
+			print "sorry, Gang Ba Dei!"
+
 
 
 
@@ -323,14 +334,14 @@ class PDR(object):
 
 					while True:
 						s5.add(And(And(*cc), self.init))
-						print "s5 solver after resetting and updating: ", s5
+						# print "s5 solver after resetting and updating: ", s5
 						if s5.check() == sat:
 							s5.reset()
-							print "s5 is sat"
+							# print "s5 is sat"
 							diff = list(set(g).difference(set(cc)))
-							print "diff: ", diff
+							# print "diff: ", diff
 							if len(diff) != 0:
-								lit = choice()
+								lit = choice(diff)
 								if lit not in cc:
 									cc.append(lit)
 							else:
@@ -338,7 +349,7 @@ class PDR(object):
 						else:
 							s5.reset()
 							break
-					print "the final cc: ", cc
+					# print "the final cc: ", cc
 					return Cube().from_list(cc)
 		return Cube().from_list(c)
 
