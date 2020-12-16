@@ -285,9 +285,6 @@ class PDR(object):
 	# 	return Cube().from_list(q)
 
 
-
-
-
 	def violateInit(self):
 		# print "the formula in violateInit to check: ", And(self.init, Not(self.post))
 		s = Solver()
