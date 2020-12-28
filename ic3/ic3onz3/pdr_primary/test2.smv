@@ -1,0 +1,58 @@
+MODULE main
+VAR
+--inputs
+i8 : boolean;
+i10 : boolean;
+--latches
+l2 : boolean;
+l24 : boolean;
+l26 : boolean;
+l4 : boolean;
+ASSIGN
+init(l2) := FALSE;
+init(l2) := FALSE;
+next(l2) := TRUE;
+init(l24) := FALSE;
+init(l24) := FALSE;
+next(l24) := i8;
+init(l26) := FALSE;
+init(l26) := FALSE;
+next(l26) := i10;
+init(l4) := FALSE;
+init(l4) := FALSE;
+next(l4) := !a60;
+DEFINE
+--ands
+a6 := !i8 & !i10;
+a22 := !l24 & !l26;
+a20 := !a22 & l24;
+a28 := i8 & !a20;
+a30 := a20 & !i8;
+a32 := !a28 & !a30;
+a34 := !l24 & l26;
+a36 := i10 & !l26;
+a38 := l26 & !i10;
+a40 := !a36 & !a38;
+a42 := !l26 & !i10;
+a44 := l26 & a40;
+a46 := !a42 & !a44;
+a48 := !l24 & a46;
+a50 := a34 & i10;
+a52 := !a34 & !a48;
+a54 := !a50 & !a52;
+a18 := a32 & !a54;
+a16 := a18 & a32;
+a14 := a16 & !a54;
+a12 := l4 & a14;
+a56 := !l2 & a6;
+a58 := l2 & a12;
+a60 := !a56 & !a58;
+a62 := l24 & !l26;
+a64 := l4 & a62;
+--outputs
+o0 := a64;
+--bad
+SPEC AG !a64 --b0
+--constraints
+--justice
+--fairness
