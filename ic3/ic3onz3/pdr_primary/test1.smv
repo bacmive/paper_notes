@@ -1,0 +1,27 @@
+MODULE main
+VAR
+--inputs
+i2 : boolean;
+i4 : boolean;
+--latches
+l12 : boolean;
+l10 : boolean;
+ASSIGN
+init(l12) := FALSE;
+init(l12) := FALSE;
+next(l12) := a6;
+init(l10) := FALSE;
+init(l10) := FALSE;
+next(l10) := a8;
+DEFINE
+--ands
+a6 := i2 & i4;
+a8 := i4 & !a6;
+a14 := !l10 & l12;
+--outputs
+o0 := a14;
+--bad
+SPEC AG !a14 --b0
+--constraints
+--justice
+--fairness

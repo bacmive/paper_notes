@@ -1,0 +1,29 @@
+aig 108 7 9 0 92 1
+1
+8
+10
+4
+12
+14
+6
+2
+213
+216
+(&&$%GE;:G&@PJHV&R
+S
+cZb]6$"..7ml{ZrÑ|zäZÑÖóåñèj$"..7pºΩEÆ¿§@8∂i0 __aig_next_x
+i1 __aig_next_running1
+i2 __aig_next_running2
+i3 __aig_next_proc1.state.1
+i4 __aig_next_proc1.state.0
+i5 __aig_next_proc2.state.1
+i6 __aig_next_proc2.state.0
+l0 __aig_initialized__
+l1 proc1.state.1
+l2 proc1.state.0
+l3 running1
+l4 proc2.state.1
+l5 proc2.state.0
+l6 running2
+l7 x
+l8 __aig_model_valid__

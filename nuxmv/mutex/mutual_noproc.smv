@@ -1,0 +1,36 @@
+MODULE user(x,running) 
+VAR 
+  state : { idle, try, crit, exit }; 
+ASSIGN 
+  init(state) := idle; 
+  next(state) := 
+    case 
+      state = idle &  running : { idle, try };
+      state =  try & x & running : crit; 
+      state =  crit & running : { crit, exit };  
+      state = exit & running  : idle; 
+      TRUE : state; 
+    esac; 
+  
+MODULE main 
+VAR 
+  x : boolean; 
+  running1: boolean;
+  running2: boolean;
+  proc1 :  user(x,running1); 
+  proc2 :  user(x,running2); 
+ASSIGN 
+  init(x) := TRUE; 
+  next(x) := 
+    case 
+      (proc1.state = try &  running1) | (proc2.state = try &  running2)  & x : FALSE; 
+      (proc1.state = exit & running1) | (proc2.state=  exit & running2)  : TRUE; 
+      TRUE : x; 
+    esac; 
+  init(running1):=FALSE;
+  init(running2):=FALSE;
+  next(running1):={TRUE,FALSE};
+  next(running2):=!next(running1);
+
+INVARSPEC
+  (!((proc1.state = crit) & (proc2.state = crit)));
